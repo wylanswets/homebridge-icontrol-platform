@@ -2,9 +2,9 @@
 Enables iControl home security systems and other accessories in Homebridge for homekit
 Currently only supports XFinity Home (the one I have)
 
-Started from https://github.com/nfarina/homebridge-icontrol
+To install:
 
-I helped to update the iControl accessory plugin above, then was inspired to fully support the platform by supporting all peripherals.
+    npm install -g homebridge-icontrol-platform
 
 To configure, add this to your homebridge config.json file:
     
@@ -22,6 +22,10 @@ To configure, add this to your homebridge config.json file:
     ]
 
 Note: ignored_devices are not currently used and may change - but the long term concept is you could filter out devices on the platform you do not actually want shown in homekit.
+
+Started from https://github.com/nfarina/homebridge-icontrol
+
+I helped to update the iControl accessory plugin above, then was inspired to fully support the platform by supporting all peripherals.
 
 # Current progress:
 
