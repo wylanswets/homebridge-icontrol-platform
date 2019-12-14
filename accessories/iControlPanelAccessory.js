@@ -113,6 +113,13 @@ iControlPanelAccessory.prototype._setTargetState = function(targetState, callbac
     self.service
       .getCharacteristic(Characteristic.SecuritySystemTargetState)
       .setValue(targetState, null, "internal");
+
+    //There is no event trigger to tell homekit we did disarm, so set it right now.
+    if(armState == 'disarmed') {
+      self.service
+        .getCharacteristic(Characteristic.SecuritySystemCurrentState)
+        .setValue(targetState);
+    }
     callback(null);
   });
 
