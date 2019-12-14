@@ -33,27 +33,29 @@ function iControlPlatform(log, config, api) {
             pinCode: config.pin
         }); 
         this.iControl.login();
+
+        this.api.on('didFinishLaunching', function() {
+
+            if(config === null) {
+                // console.log(platform.accessories);
+                for(var i in platform.accessories) {
+                    platform.removeAccessory(platform.accessories[i]);
+                }
+                
+            } else {
+                // console.log("done launching - fetching any new accessories");
+                platform.iControl._getAccessories(function(data) {
+                    // console.log(platform.accessories);
+                    platform.addAccessories(data);
+                });
+            }
+    
+            platform.subscribeEvents();
+    
+        });
     }
 
-    this.api.on('didFinishLaunching', function() {
-
-        if(config === null) {
-            // console.log(platform.accessories);
-            for(var i in platform.accessories) {
-                platform.removeAccessory(platform.accessories[i]);
-            }
-            
-        } else {
-            // console.log("done launching - fetching any new accessories");
-            platform.iControl._getAccessories(function(data) {
-                // console.log(platform.accessories);
-                platform.addAccessories(data);
-            });
-        }
-
-        platform.subscribeEvents();
-
-    });
+    
 
 }
 
