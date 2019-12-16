@@ -45,9 +45,11 @@ function iControlPlatform(log, config, api) {
                 
             } else {
                 // console.log("done launching - fetching any new accessories");
-                platform.iControl._getAccessories(function(data) {
+                platform.iControl._getAccessories(function(data, error) {
                     // console.log(platform.accessories);
-                    platform.addAccessories(data);
+                    if(error === null) {
+                        platform.addAccessories(data);
+                    }
                 });
             }
     

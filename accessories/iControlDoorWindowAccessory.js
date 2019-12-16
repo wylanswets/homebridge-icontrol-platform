@@ -49,55 +49,51 @@ iControlDoorWindowAccessory.prototype.event = function(event) {
     }
 }
 
-iControlDoorWindowAccessory.prototype._getActiveStatus = function(callback) {
-    var self = this;
-    this.session._getCurrentStatus(function(data) {
-        for(var i in data.devices) {
-          var device = data.devices[i];
-          if(device.serialNumber == self.sensor.serialNumber) {
-              console.log(!device.properties.isBypassed);
-              callback(!device.properties.isBypassed);
-          }
-          
-        }
-    });
-}
-
 iControlDoorWindowAccessory.prototype._getTamperStatus = function(callback) {
     var self = this;
-    this.session._getCurrentStatus(function(data) {
-        for(var i in data.devices) {
-          var device = data.devices[i];
-          if(device.serialNumber == self.sensor.serialNumber) {
-            var tampered = false;
-            if(device.trouble.length !== 0) {
-                for(var j in device.trouble) {
-                    if(device.trouble[j].name === 'senTamp') {
-                        tampered = true;
-                    }
+    this.session._getCurrentStatus(function(data, error) {
+        if(error === null) {
+            for(var i in data.devices) {
+                var device = data.devices[i];
+                if(device.serialNumber == self.sensor.serialNumber) {
+                  var tampered = false;
+                  if(device.trouble.length !== 0) {
+                      for(var j in device.trouble) {
+                          if(device.trouble[j].name === 'senTamp') {
+                              tampered = true;
+                          }
+                      }
+                  }
+      
+                  var tamperStatus = self._getHomeKitTamperStateFromTamperState(tampered);
+      
+                  callback(tamperStatus);
                 }
-            }
-
-            var tamperStatus = self._getHomeKitTamperStateFromTamperState(tampered);
-
-            callback(tamperStatus);
-          }
-          
+                
+              }
+        } else {
+            callback(null);
         }
+        
     });
 }
 
 iControlDoorWindowAccessory.prototype._getCurrentState = function(callback) {
   var self = this;
-  this.session._getCurrentStatus(function(data) {
-      for(var i in data.devices) {
-        var device = data.devices[i];
-        if(device.serialNumber == self.sensor.serialNumber) {
-            var currentState = self._getHomeKitStateFromCurrentState(device.properties.isFaulted);
-            callback(null, currentState);
-        }
-        
+  this.session._getCurrentStatus(function(data, error) {
+      if(error === null) {
+        for(var i in data.devices) {
+            var device = data.devices[i];
+            if(device.serialNumber == self.sensor.serialNumber) {
+                var currentState = self._getHomeKitStateFromCurrentState(device.properties.isFaulted);
+                callback(null, currentState);
+            }
+            
+          }
+      } else {
+          callback(null, null);
       }
+      
   });
 }
 

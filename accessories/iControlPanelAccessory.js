@@ -50,8 +50,8 @@ iControlAccessory.prototype.event = function(event) {
 
 iControlPanelAccessory.prototype._getTargetState = function(callback) {
   var self = this;
-  this.session._getCurrentStatus(function(data) {
-  
+  this.session._getCurrentStatus(function(data, error) {
+    if(error === null) {
       for(var i in data.devices) {
         var device = data.devices[i];
         if(device.serialNumber == self.panel.serialNumber) {
@@ -61,12 +61,17 @@ iControlPanelAccessory.prototype._getTargetState = function(callback) {
         }
         
       }
+    } else {
+      callback(null, null);
+    }
+      
   });
 }
 
 iControlPanelAccessory.prototype._getCurrentState = function(callback) {
   var self = this;
-  this.session._getCurrentStatus(function(data) {
+  this.session._getCurrentStatus(function(data, error) {
+    if(error === null) {
       for(var i in data.devices) {
         var device = data.devices[i];
         if(device.serialNumber == self.panel.serialNumber) {
@@ -81,6 +86,10 @@ iControlPanelAccessory.prototype._getCurrentState = function(callback) {
         }
         
       }
+    } else {
+      callback(null, null);
+    }
+      
   });
 }
 
@@ -109,18 +118,23 @@ iControlPanelAccessory.prototype._setTargetState = function(targetState, callbac
     form: form
   }
   var self = this;
-  this.session._makeAuthenticatedRequest(req, function(data) {
-    self.service
-      .getCharacteristic(Characteristic.SecuritySystemTargetState)
-      .setValue(targetState, null, "internal");
-
-    //There is no event trigger to tell homekit we did disarm, so set it right now.
-    if(armState == 'disarmed') {
+  this.session._makeAuthenticatedRequest(req, function(data, error) {
+    if(error === null) {
       self.service
-        .getCharacteristic(Characteristic.SecuritySystemCurrentState)
-        .setValue(targetState);
+        .getCharacteristic(Characteristic.SecuritySystemTargetState)
+        .setValue(targetState, null, "internal");
+
+      //There is no event trigger to tell homekit we did disarm, so set it right now.
+      if(armState == 'disarmed') {
+        self.service
+          .getCharacteristic(Characteristic.SecuritySystemCurrentState)
+          .setValue(targetState);
+      }
+      callback(null);
+    } else {
+      callback(null);
     }
-    callback(null);
+    
   });
 
 }
