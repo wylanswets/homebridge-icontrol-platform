@@ -46,7 +46,6 @@ function iControlPlatform(log, config, api) {
             } else {
                 // console.log("done launching - fetching any new accessories");
                 platform.iControl._getAccessories(function(data, error) {
-                    // console.log(platform.accessories);
                     if(error === null) {
                         platform.addAccessories(data);
                     }
@@ -131,11 +130,11 @@ iControlPlatform.prototype.addAccessories = function(APIAccessories) {
                     case "dryContact":
                         // console.log(newAccessory);
                         if(accessory === undefined) {
-                            // this.log("New dry contact");
+                            this.log("New dry contact");
                             self.registerDoorWindowAccessory(newAccessory);
                         } else {
-                            // this.log("Dry contact is online");
-                            self.accessories[uuid] = new iControlDoorWindowAccessory(self.log, (accessory instanceof iControlPanelAccessory ? accessory.accessory : accessory), newAccessory, self.iControl);
+                            this.log("Dry contact is online");
+                            self.accessories[uuid] = new iControlDoorWindowAccessory(self.log, (accessory instanceof iControlDoorWindowAccessory ? accessory.accessory : accessory), newAccessory, self.iControl);
                         }
                         break;
                     
