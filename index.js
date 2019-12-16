@@ -2,6 +2,7 @@ var iControl = require('icontrol-api').iControl;
 var Accessory, Service, Characteristic, UUIDGen;
 
 var iControlPanelAccessory = require('./accessories/iControlPanelAccessory');
+var iControlDoorWindowAccessory = require('./accessories/iControlDoorWindowAccessory');
 
 module.exports = function(homebridge) {
     console.log("homebridge API version: " + homebridge.version);
@@ -95,8 +96,21 @@ iControlPlatform.prototype.addAccessories = function(APIAccessories) {
     var self = this;
 
     for(var i in APIAccessories) {
-
+        
         var newAccessory = APIAccessories[i];
+
+        switch(newAccessory.deviceType) {
+            case "panel":
+            case "sensor":
+                //Supported accessory, continue down below.
+                break;
+            default:
+                //Will skip below for unsupported accessories and move on to the next one in the list.
+                //Type of "peripheral" does not have a serial number and cannot be controlled
+                continue;
+        }
+
+
         var uuid = UUIDGen.generate(newAccessory.serialNumber);
         var accessory = this.accessories[uuid];
 
@@ -105,19 +119,45 @@ iControlPlatform.prototype.addAccessories = function(APIAccessories) {
                 if(accessory === undefined) {
                     self.registerPanelAccessory(newAccessory);
                 } else {
-
-                    self.log("Panel is online");
+                    // self.log("Panel is online");
                     self.accessories[uuid] = new iControlPanelAccessory(self.log, (accessory instanceof iControlPanelAccessory ? accessory.accessory : accessory), newAccessory, self.iControl);
                 }
-                
                 break;
-            default:
-                console.log("wut?");
-                break;
+            case "sensor":
+                //Sensors can be dryContact or motion
+                switch(newAccessory.properties.sensorType) {
+                    case "dryContact":
+                        // console.log(newAccessory);
+                        if(accessory === undefined) {
+                            // this.log("New dry contact");
+                            self.registerDoorWindowAccessory(newAccessory);
+                        } else {
+                            // this.log("Dry contact is online");
+                            self.accessories[uuid] = new iControlDoorWindowAccessory(self.log, (accessory instanceof iControlPanelAccessory ? accessory.accessory : accessory), newAccessory, self.iControl);
+                        }
+                        break;
+                    
+                }
         }
         
     }
     this.log("done adding accessories.");
+}
+
+iControlPlatform.prototype.registerDoorWindowAccessory = function(accessory) {
+
+    this.log("Adding sensor: " + accessory.serialNumber);
+
+    var uuid = UUIDGen.generate(accessory.serialNumber);
+    var name = accessory.name == '' ? "Dry Contact" : accessory.name;
+    var acc = new Accessory(name, uuid);
+
+    acc.addService(Service.ContactSensor);
+
+    this.accessories[uuid] = new iControlDoorWindowAccessory(this.log, acc, accessory, this.iControl);
+
+    this.api.registerPlatformAccessories("homebridge-icontrol-platform", "iControl", [acc]);
+
 }
 
 iControlPlatform.prototype.registerPanelAccessory = function(accessory) {
