@@ -8,6 +8,9 @@ function iControlAccessory(log, accessory, data, session) {
   info.setCharacteristic(global.Characteristic.Model, accessory.context.model.toString());
   
   accessory.context.serial = data.serialNumber;
+  if(data.serialNumber === undefined) {
+    accessory.context.serial = data.hardwareId;
+  }
   info.setCharacteristic(global.Characteristic.SerialNumber, accessory.context.serial.toString());
   
   accessory.context.revision = data.firmwareVersion;

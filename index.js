@@ -3,6 +3,7 @@ var Accessory, Service, Characteristic, UUIDGen;
 
 var iControlPanelAccessory = require('./accessories/iControlPanelAccessory');
 var iControlDoorWindowAccessory = require('./accessories/iControlDoorWindowAccessory');
+var iControlLightAccessory = require('./accessories/iControlLightAccessory');
 
 module.exports = function(homebridge) {
     console.log("homebridge API version: " + homebridge.version);
@@ -48,27 +49,20 @@ function iControlPlatform(log, config, api) {
                 platform.iControl._getAccessories(function(data, error) {
                     if(error === null) {
                         platform.addAccessories(data);
+                        platform.subscribeEvents();
                     }
                 });
             }
-    
-            platform.subscribeEvents();
-    
         });
     }
-
-    
-
 }
 
 iControlPlatform.prototype.subscribeEvents = function() {
 
     //Do this on repeat and send statuses to all accessories
-    // console.log("Opening subscription...");
     var self = this;
     self.iControl.subscribeEvents(function(error, data) {
         if(error !== null) {
-            // console.log("error:");
             console.log(error);
         } else {
             //Loop through each event and send it to every accessory
@@ -92,10 +86,7 @@ iControlPlatform.prototype.configureAccessory = function(accessory) {
 }
 
 iControlPlatform.prototype.addAccessories = function(APIAccessories) {
-    
-
     var self = this;
-
     for(var i in APIAccessories) {
         
         var newAccessory = APIAccessories[i];
@@ -103,6 +94,8 @@ iControlPlatform.prototype.addAccessories = function(APIAccessories) {
         switch(newAccessory.deviceType) {
             case "panel":
             case "sensor":
+            case "lightDimmer":
+            case "lightSwitch":
                 //Supported accessory, continue down below.
                 break;
             default:
@@ -111,8 +104,13 @@ iControlPlatform.prototype.addAccessories = function(APIAccessories) {
                 continue;
         }
 
-
-        var uuid = UUIDGen.generate(newAccessory.serialNumber);
+        var uuid = null;
+        if(newAccessory.serialNumber === undefined) {
+            uuid = UUIDGen.generate(newAccessory.hardwareId);
+        } else {
+            uuid = UUIDGen.generate(newAccessory.serialNumber);
+        }
+         
         var accessory = this.accessories[uuid];
 
         switch(newAccessory.deviceType) {
@@ -120,7 +118,6 @@ iControlPlatform.prototype.addAccessories = function(APIAccessories) {
                 if(accessory === undefined) {
                     self.registerPanelAccessory(newAccessory);
                 } else {
-                    // self.log("Panel is online");
                     self.accessories[uuid] = new iControlPanelAccessory(self.log, (accessory instanceof iControlPanelAccessory ? accessory.accessory : accessory), newAccessory, self.iControl);
                 }
                 break;
@@ -128,17 +125,23 @@ iControlPlatform.prototype.addAccessories = function(APIAccessories) {
                 //Sensors can be dryContact or motion
                 switch(newAccessory.properties.sensorType) {
                     case "dryContact":
-                        // console.log(newAccessory);
                         if(accessory === undefined) {
-                            this.log("New dry contact");
                             self.registerDoorWindowAccessory(newAccessory);
                         } else {
-                            this.log("Dry contact is online");
                             self.accessories[uuid] = new iControlDoorWindowAccessory(self.log, (accessory instanceof iControlDoorWindowAccessory ? accessory.accessory : accessory), newAccessory, self.iControl);
                         }
                         break;
                     
                 }
+                break;
+            case "lightSwitch":
+            case "lightDimmer":
+                if(accessory === undefined) {
+                    self.registerLightAccessory(newAccessory);
+                } else {
+                    self.accessories[uuid] = new iControlLightAccessory(self.log, (accessory instanceof iControlLightAccessory ? accessory.accessory : accessory), newAccessory, self.iControl);
+                }
+                break;
         }
         
     }
@@ -174,6 +177,20 @@ iControlPlatform.prototype.registerPanelAccessory = function(accessory) {
     this.accessories[uuid] = new iControlPanelAccessory(this.log, acc, accessory, this.iControl);
 
     this.api.registerPlatformAccessories("homebridge-icontrol-platform", "iControl", [acc]);
+}
+
+iControlPlatform.prototype.registerLightAccessory = function(accessory) {
+    this.log("Found new light: " + accessory.hardwareId);
+    var uuid = UUIDGen.generate(accessory.hardwareId);
+    var name = accessory.name == '' ? "Light" : accessory.name;
+    var acc = new Accessory(name, uuid);
+
+    acc.addService(Service.Lightbulb, name);
+
+    this.accessories[uuid] = new iControlLightAccessory(this.log, acc, accessory, this.iControl);
+
+    this.api.registerPlatformAccessories("homebridge-icontrol-platform", "iControl", [acc]);
+
 }
 
 iControlPlatform.prototype.removeAccessory = function(accessory) {
