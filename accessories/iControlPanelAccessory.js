@@ -26,14 +26,8 @@ iControlPanelAccessory.prototype = Object.create(iControlAccessory.prototype);
 
 
 iControlAccessory.prototype.event = function(event) {
-  // console.log("Event is now in panel accessory");
-  // console.log(event);
-
   if(event.mediaType == "event/securityStateChange") {
     var armType = event.metadata.armType || 'disarmed';
-    // console.log("Setting arm state to " + armType);
-    // console.log(event);
-
     this.service
       .getCharacteristic(global.Characteristic.SecuritySystemTargetState)
       .setValue(this._getHomeKitStateFromArmState(armType), null, "internal");
@@ -43,9 +37,7 @@ iControlAccessory.prototype.event = function(event) {
         .getCharacteristic(global.Characteristic.SecuritySystemCurrentState)
         .setValue(this._getHomeKitStateFromArmState(armType));
     }
-    
   }
-
 }
 
 iControlPanelAccessory.prototype._getTargetState = function(callback) {
@@ -59,12 +51,10 @@ iControlPanelAccessory.prototype._getTargetState = function(callback) {
           var currentState = self._getHomeKitStateFromArmState(armType);
           callback(null, currentState);
         }
-        
       }
     } else {
       callback(null, null);
     }
-      
   });
 }
 

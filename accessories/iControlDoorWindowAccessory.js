@@ -27,7 +27,6 @@ iControlDoorWindowAccessory.prototype.event = function(event) {
  
     //Check if this event is for this sensor
     if(event.deviceId === this.sensor.id) {
-        console.log(event);
         //Faulted is contact open or closed
         if(event.name === 'isFaulted') {
             var targetState = this._getHomeKitStateFromCurrentState(event.value);

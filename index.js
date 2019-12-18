@@ -7,7 +7,6 @@ var iControlDoorWindowAccessory = require('./accessories/iControlDoorWindowAcces
 var iControlLightAccessory = require('./accessories/iControlLightAccessory');
 
 module.exports = function(homebridge) {
-    console.log("homebridge API version: " + homebridge.version);
 
     // Accessory must be created from PlatformAccessory Constructor
     Accessory = homebridge.platformAccessory; global.Accessory = homebridge.platformAccessory;
@@ -40,13 +39,11 @@ function iControlPlatform(log, config, api) {
         this.api.on('didFinishLaunching', function() {
 
             if(config === null) {
-                // console.log(platform.accessories);
                 for(var i in platform.accessories) {
                     platform.removeAccessory(platform.accessories[i]);
                 }
                 
             } else {
-                // console.log("done launching - fetching any new accessories");
                 platform.iControl._getAccessories(function(data, error) {
                     if(error === null) {
                         platform.addAccessories(data);

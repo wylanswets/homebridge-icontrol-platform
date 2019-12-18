@@ -60,8 +60,6 @@ iControlLightAccessory.prototype._getBrightnessState = function(callback) {
             for(var i in data.devices) {
                 var device = data.devices[i];
                 if(device.hardwareId == self.light.hardwareId) {
-                    // console.log(device.properties.level);
-                    // console.log(device);
                     callback(null, device.properties.level);
                     return;
                 }
@@ -79,7 +77,7 @@ iControlLightAccessory.prototype._setBrightnessState = function(brightness, call
     }
     this._lastSetDate = new Date();
     var self = this;
-    // console.log("Brightness: " + brightness);
+
     var req = {
         method: "POST",
         path: "client/icontrol/update/device",
