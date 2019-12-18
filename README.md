@@ -27,8 +27,13 @@ Started from https://github.com/nfarina/homebridge-icontrol
 
 I helped to update the iControl accessory plugin above, then was inspired to fully support the platform by supporting all peripherals.
 
-# Current progress:
+## Not yet done:
+* Alarm being set off to trigger homekit alarm "triggered" state.
 
-Only supports the security panel but has an under the hood enhancement for supporting their "notification" system that will have much more up to date status as the panel is actually armed / disarmed.
-This notification work will allow future supported devices on the platform to be used in automations provided they send a live status update. 
-  
+## Supports:
+* Alarm Panel (does not yet trigger alarm state in homekit - haven't set my alarm off to test yet)
+* Door / Window sensors (gives live open / close state)
+* "Lights" (outlets) - when these are in dimmable mode homekit will show a dimmer, when in on/off mode you will only get a switch. 
+
+## Does not support:
+* Motion sensors - these only trigger motion notices when the alarm is set for away mode rendering these unhelpful for automations and thus cluttering up homekit
