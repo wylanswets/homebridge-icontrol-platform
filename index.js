@@ -1,4 +1,5 @@
 var iControl = require('icontrol-api').iControl;
+var process = require('process');
 var Accessory, Service, Characteristic, UUIDGen;
 
 var iControlPanelAccessory = require('./accessories/iControlPanelAccessory');
@@ -61,24 +62,29 @@ iControlPlatform.prototype.subscribeEvents = function() {
 
     //Do this on repeat and send statuses to all accessories
     var self = this;
-    self.iControl.subscribeEvents(function(error, data) {
-        if(error !== null) {
-            console.log(error);
-        } else {
-            //Loop through each event and send it to every accessory
-            //This way each accessory can decide if it needs to do anything with the event
-            //Most accessories will likely look at if the deviceId matches their ID
-            for(var i in data) {
-                var event = data[i];
-                for(var j in self.accessories) {
-                    self.accessories[j].event(event);
+
+    process.nextTick(() => {
+        self.iControl.subscribeEvents(function(error, data) {
+            if(error !== null) {
+                self.log(error);
+            } else {
+                //Loop through each event and send it to every accessory
+                //This way each accessory can decide if it needs to do anything with the event
+                //Most accessories will likely look at if the deviceId matches their ID
+                for(var i in data) {
+                    var event = data[i];
+                    for(var j in self.accessories) {
+                        self.accessories[j].event(event);
+                    }
                 }
             }
-        }
-
-        //We're done with this, open a new one
-        self.subscribeEvents();
+    
+            //We're done with this, open a new one
+            self.subscribeEvents();
+        });
     });
+
+    
 }
 
 iControlPlatform.prototype.configureAccessory = function(accessory) {
@@ -145,13 +151,10 @@ iControlPlatform.prototype.addAccessories = function(APIAccessories) {
         }
         
     }
-    this.log("done adding accessories.");
+    this.log("Finished loading.");
 }
 
 iControlPlatform.prototype.registerDoorWindowAccessory = function(accessory) {
-
-    this.log("Adding sensor: " + accessory.serialNumber);
-
     var uuid = UUIDGen.generate(accessory.serialNumber);
     var name = accessory.name == '' ? "Dry Contact" : accessory.name;
     var acc = new Accessory(name, uuid);
@@ -165,9 +168,6 @@ iControlPlatform.prototype.registerDoorWindowAccessory = function(accessory) {
 }
 
 iControlPlatform.prototype.registerPanelAccessory = function(accessory) {
-
-    this.log('Found new panel: ' + accessory.serialNumber);
-    
     var uuid = UUIDGen.generate(accessory.serialNumber);
     var name = accessory.name == '' ? "Security System" : accessory.name;
     var acc = new Accessory(name, uuid);
@@ -180,7 +180,6 @@ iControlPlatform.prototype.registerPanelAccessory = function(accessory) {
 }
 
 iControlPlatform.prototype.registerLightAccessory = function(accessory) {
-    this.log("Found new light: " + accessory.hardwareId);
     var uuid = UUIDGen.generate(accessory.hardwareId);
     var name = accessory.name == '' ? "Light" : accessory.name;
     var acc = new Accessory(name, uuid);
@@ -194,7 +193,7 @@ iControlPlatform.prototype.registerLightAccessory = function(accessory) {
 }
 
 iControlPlatform.prototype.removeAccessory = function(accessory) {
-    console.log("Removing accessories");
+    this.log("Removed all accessories.");
     // return;
     if (accessory) {
         this.log("[" + accessory.name + "] Removed from HomeBridge.");

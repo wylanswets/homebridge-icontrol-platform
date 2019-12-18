@@ -18,7 +18,8 @@
     "homebridge": ">=0.2.0"
   },
   "dependencies": {
-    "icontrol-api": "^1.0.0"
+    "icontrol-api": "^1.0.0",
+    "process": "^0.11.10"
   },
   "homepage": "https://github.com/wylanswets/homebridge-icontrol-platform#readme",
   "main": "index.js",
