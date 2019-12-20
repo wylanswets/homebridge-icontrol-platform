@@ -59,27 +59,31 @@ iControlPlatform.prototype.subscribeEvents = function() {
 
     //Do this on repeat and send statuses to all accessories
     var self = this;
-
-    process.nextTick(() => {
-        self.iControl.subscribeEvents(function(error, data) {
-            if(error !== null) {
-                self.log(error);
-            } else {
-                //Loop through each event and send it to every accessory
-                //This way each accessory can decide if it needs to do anything with the event
-                //Most accessories will likely look at if the deviceId matches their ID
-                for(var i in data) {
-                    var event = data[i];
-                    for(var j in self.accessories) {
-                        self.accessories[j].event(event);
+    
+    var recurse = function() {
+        process.nextTick(() => {
+            self.iControl.subscribeEvents(function(error, data) {
+                if(error !== null) {
+                    self.log(error);
+                } else {
+                    //Loop through each event and send it to every accessory
+                    //This way each accessory can decide if it needs to do anything with the event
+                    //Most accessories will likely look at if the deviceId matches their ID
+                    for(var i in data) {
+                        var event = data[i];
+                        for(var j in self.accessories) {
+                            self.accessories[j].event(event);
+                        }
                     }
                 }
-            }
-    
-            //We're done with this, open a new one
-            self.subscribeEvents();
+        
+                //We're done with this, open a new one
+                recurse();
+            });
         });
-    });
+    }
+
+    recurse();
 
     
 }
