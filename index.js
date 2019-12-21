@@ -26,6 +26,7 @@ function iControlPlatform(log, config, api) {
     this.accessories = [];
     this.api = api;
     var platform = this;
+    this.subscribed = false;
 
     if(config !== null) {
         this.iControl = new iControl({
@@ -47,6 +48,7 @@ function iControlPlatform(log, config, api) {
                 platform.iControl._getAccessories(function(data, error) {
                     if(error === null) {
                         platform.addAccessories(data);
+                        this.subscribed = true;
                         platform.subscribeEvents();
                     }
                 });
@@ -62,7 +64,7 @@ iControlPlatform.prototype.subscribeEvents = function() {
     
     var recurse = function() {
         process.nextTick(() => {
-            self.iControl.subscribeEvents(function(error, data) {
+            self.iControl.subscribeEvents(function(data, error) {
                 if(error !== null) {
                     self.log(error);
                 } else {
