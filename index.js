@@ -66,7 +66,12 @@ iControlPlatform.prototype.subscribeEvents = function() {
         process.nextTick(() => {
             self.iControl.subscribeEvents(function(data, error) {
                 if(error !== null) {
-                    self.log(error);
+                    // self.log(error);
+                    //Let's give the server some time before we immediately start bugging it again.
+                    self.log("Backing off live updates for 5 seconds.");
+                    setTimeout(function() {
+                        recurse();
+                    }, 5000);
                 } else {
                     //Loop through each event and send it to every accessory
                     //This way each accessory can decide if it needs to do anything with the event
@@ -77,10 +82,12 @@ iControlPlatform.prototype.subscribeEvents = function() {
                             self.accessories[j].event(event);
                         }
                     }
+                    //Immediately start new connection
+                    recurse();
                 }
-        
+                
                 //We're done with this, open a new one
-                recurse();
+                // recurse();
             });
         });
     }
