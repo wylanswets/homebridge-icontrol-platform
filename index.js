@@ -79,7 +79,12 @@ iControlPlatform.prototype.subscribeEvents = function() {
                     for(var i in data) {
                         var event = data[i];
                         for(var j in self.accessories) {
-                            self.accessories[j].event(event);
+                            try {
+                                self.accessories[j].event(event);
+                            }
+                            catch(e) {
+                                console.log(e);
+                            }
                         }
                     }
                     //Immediately start new connection
