@@ -1,6 +1,6 @@
 {
   "name": "homebridge-icontrol-platform",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "iControl (Xfinity Home) for Homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [
@@ -18,7 +18,7 @@
     "homebridge": ">=0.2.0"
   },
   "dependencies": {
-    "icontrol-api": "^1.0.0",
+    "icontrol-api": "^1.1.2",
     "process": "^0.11.10"
   },
   "homepage": "https://github.com/wylanswets/homebridge-icontrol-platform#readme",
