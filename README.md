@@ -17,15 +17,13 @@ To configure, add this to your homebridge config.json file:
             "email": "email@email.com",
             "password": "password_here",
             "pin": "1234",
-            "ignored_devices": []
+            "path": "/OPTIONAL/your/absolute/path/persist
         }
     ]
 
-Note: ignored_devices are not currently used and may change - but the long term concept is you could filter out devices on the platform you do not actually want shown in homekit.
 
-Started from https://github.com/nfarina/homebridge-icontrol
-
-I helped to update the iControl accessory plugin above, then was inspired to fully support the platform by supporting all peripherals.
+## Path parameter (optional): 
+Can be an absolute path or relative path - in most cases if you have a spot you know works, just use the absolute path to that folder. If you do not provide a "path" parameter it will default to the relative execution path.
 
 ## Not yet done:
 * Alarm being set off to trigger homekit alarm "triggered" state.
@@ -37,3 +35,9 @@ I helped to update the iControl accessory plugin above, then was inspired to ful
 
 ## Does not support:
 * Motion sensors - these only trigger motion notices when the alarm is set for away mode rendering these unhelpful for automations and thus cluttering up homekit
+
+
+### Notes
+Started from https://github.com/nfarina/homebridge-icontrol
+
+I helped to update the iControl accessory plugin above, then was inspired to fully support the platform by supporting all peripherals.
