@@ -33,7 +33,8 @@ function iControlPlatform(log, config, api) {
             system: iControl.Systems[config.system],
             email: config.email,
             password: config.password,
-            pinCode: config.pin
+            pinCode: config.pin,
+            path: config.path
         }); 
         this.iControl.login();
 
