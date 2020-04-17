@@ -78,10 +78,12 @@ iControlPlatform.prototype.subscribeEvents = function() {
                     //This way each accessory can decide if it needs to do anything with the event
                     //Most accessories will likely look at if the deviceId matches their ID
                     for(var i in data) {
-                        var event = data[i];
+                        var evnt = data[i];
                         for(var j in self.accessories) {
                             try {
-                                self.accessories[j].event(event);
+                                if(typeof self.accessories[j].event === "function") {
+                                    self.accessories[j].event(evnt);
+                                }
                             }
                             catch(e) {
                                 console.log(e);
