@@ -31,6 +31,8 @@ Due to recent updates from Comcast on their OAuth flow, it initially looks like 
 
 I am not sure how much time I will spend on finding other workarounds or ways forward... as the refresh tokens are very reliable once you have one. The trick is to have a SEPARATE account that Homebridge uses so that the refresh token will not be replaced when you log in to your app with that same account. If there is a need I can point out more helpful instructions for intercepting the tokens, and appologize there is not more that can be done at this time.
 
+Once the refresh token has been used to log in, it can be removed from the config so the internally cached refresh token will be used.
+
 ## Not yet done:
 * Alarm being set off to trigger homekit alarm "triggered" state.
 
