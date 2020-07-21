@@ -34,7 +34,8 @@ function iControlPlatform(log, config, api) {
             email: config.email,
             password: config.password,
             pinCode: config.pin,
-            path: config.path
+            path: config.path,
+            refresh_token: config.refresh_token
         }); 
         this.iControl.login();
 
