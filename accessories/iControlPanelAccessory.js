@@ -42,11 +42,23 @@ iControlAccessory.prototype.event = function(event) {
 
 iControlPanelAccessory.prototype._getTargetState = function(callback) {
   var self = this;
+  var found = false;
   this.session._getCurrentStatus(function(data, error) {
     if(error === null) {
       for(var i in data.devices) {
         var device = data.devices[i];
-        if(device.serialNumber == self.panel.serialNumber) {
+        
+        //Workaround for if / when a panel does not have a serial number and is relying on HardwareID
+        if(found) {
+          return;
+        }
+        if(self.panel.serialNumber === undefined && device.hardwareId == self.panel.hardwareId) {
+          found = true;
+        } else if(device.serialNumber == self.panel.serialNumber) {
+          found = true;
+        }
+        if(found) {
+          firstFound = device;
           var armType = device.properties.armType || "disarmed"; // "away", "night", "stay", or null (disarmed)
           var currentState = self._getHomeKitStateFromArmState(armType);
           callback(null, currentState);
@@ -60,11 +72,23 @@ iControlPanelAccessory.prototype._getTargetState = function(callback) {
 
 iControlPanelAccessory.prototype._getCurrentState = function(callback) {
   var self = this;
+  var found;
   this.session._getCurrentStatus(function(data, error) {
     if(error === null) {
       for(var i in data.devices) {
         var device = data.devices[i];
-        if(device.serialNumber == self.panel.serialNumber) {
+        
+        //Workaround for if / when a panel does not have a serial number and is relying on HardwareID
+        if(found) {
+          return;
+        }
+        if(self.panel.serialNumber === undefined && device.hardwareId == self.panel.hardwareId) {
+          found = true;
+        } else if(device.serialNumber == self.panel.serialNumber) {
+          found = true;
+        }
+        
+        if(found) {
           var armType = device.properties.armType || "disarmed"; // "away", "night", "stay", or null (disarmed)
           if(armType != "disarmed" && device.properties.status == "arming") {
             //We are here when we have not yet fully armed the panel yet.

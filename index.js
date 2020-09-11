@@ -187,7 +187,13 @@ iControlPlatform.prototype.registerDoorWindowAccessory = function(accessory) {
 }
 
 iControlPlatform.prototype.registerPanelAccessory = function(accessory) {
-    var uuid = UUIDGen.generate(accessory.serialNumber);
+    var uuid;
+    if(accessory.serialNumber === undefined) {
+        uuid = UUIDGen.generate(accessory.hardwareId);
+    } else {
+        uuid = UUIDGen.generate(accessory.serialNumber);
+    }
+    
     var name = accessory.name == '' ? "Security System" : accessory.name;
     var acc = new Accessory(name, uuid);
 
