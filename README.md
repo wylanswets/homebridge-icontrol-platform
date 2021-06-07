@@ -1,51 +1,150 @@
-# homebridge-icontrol-platform
-Enables iControl home security systems and other accessories in Homebridge for homekit
-Currently only supports XFinity Home (the one I have)
 
-To install:
+<p align="center">
 
-    npm install -g homebridge-icontrol-platform
+<img src="https://github.com/homebridge/branding/raw/master/logos/homebridge-wordmark-logo-vertical.png" width="150">
 
-To configure, add this to your homebridge config.json file:
-    
-    
-    "platforms": [
-        {
-            "platform": "iControl",
-            "name": "iControl Platform",
-            "system": "XFINITY_HOME",
-            "email": "email@email.com",
-            "password": "password_here",
-            "pin": "1234",
-            "path": "/OPTIONAL/your/absolute/path/persist,
-            "refresh_token": "refresh token that you got by using a proxy on your phone"
-        }
-    ]
+</p>
 
 
-## Path parameter (optional): 
-Can be an absolute path or relative path - in most cases if you have a spot you know works, just use the absolute path to that folder. If you do not provide a "path" parameter it will default to the relative execution path.
+# Homebridge Platform Plugin Template
 
-## Refresh Token (optional - workaround for login no longer working)
-Due to recent updates from Comcast on their OAuth flow, it initially looks like it will be tricky to get a full login flow working again. As such I have updated the plugin to accept a refresh token in the configuration which can be captured using a proxy (like burpsuite) to intercept the refresh token when your phone app is initially starting up (I was able to see it when booting up the app that was already logged in).
+This is a template Homebridge platform plugin and can be used as a base to help you get started developing your own plugin.
 
-I am not sure how much time I will spend on finding other workarounds or ways forward... as the refresh tokens are very reliable once you have one. The trick is to have a SEPARATE account that Homebridge uses so that the refresh token will not be replaced when you log in to your app with that same account. If there is a need I can point out more helpful instructions for intercepting the tokens, and appologize there is not more that can be done at this time.
+This template should be used in conjunction with the [developer documentation](https://developers.homebridge.io/). A full list of all supported service types, and their characteristics is available on this site.
 
-Once the refresh token has been used to log in, it can be removed from the config so the internally cached refresh token will be used.
+## Clone As Template
 
-## Not yet done:
-* Alarm being set off to trigger homekit alarm "triggered" state.
+Click the link below to create a new GitHub Repository using this template, or click the *Use This Template* button above.
 
-## Supports:
-* Alarm Panel (does not yet trigger alarm state in homekit - haven't set my alarm off to test yet)
-* Door / Window sensors (gives live open / close state)
-* "Lights" (outlets) - when these are in dimmable mode homekit will show a dimmer, when in on/off mode you will only get a switch. 
+<span align="center">
 
-## Does not support:
-* Motion sensors - these only trigger motion notices when the alarm is set for away mode rendering these unhelpful for automations and thus cluttering up homekit
+### [Create New Repository From Template](https://github.com/homebridge/homebridge-plugin-template/generate)
+
+</span>
+
+## Setup Development Environment
+
+To develop Homebridge plugins you must have Node.js 12 or later installed, and a modern code editor such as [VS Code](https://code.visualstudio.com/). This plugin template uses [TypeScript](https://www.typescriptlang.org/) to make development easier and comes with pre-configured settings for [VS Code](https://code.visualstudio.com/) and ESLint. If you are using VS Code install these extensions:
+
+* [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+
+## Install Development Dependencies
+
+Using a terminal, navigate to the project folder and run this command to install the development dependencies:
+
+```
+npm install
+```
+
+## Update package.json
+
+Open the [`package.json`](./package.json) and change the following attributes:
+
+* `name` - this should be prefixed with `homebridge-` or `@username/homebridge-` and contain no spaces or special characters apart from a dashes
+* `displayName` - this is the "nice" name displayed in the Homebridge UI
+* `repository.url` - Link to your GitHub repo
+* `bugs.url` - Link to your GitHub repo issues page
+
+When you are ready to publish the plugin you should set `private` to false, or remove the attribute entirely.
+
+## Update Plugin Defaults
+
+Open the [`src/settings.ts`](./src/settings.ts) file and change the default values:
+
+* `PLATFORM_NAME` - Set this to be the name of your platform. This is the name of the platform that users will use to register the plugin in the Homebridge `config.json`.
+* `PLUGIN_NAME` - Set this to be the same name you set in the [`package.json`](./package.json) file. 
+
+Open the [`config.schema.json`](./config.schema.json) file and change the following attribute:
+
+* `pluginAlias` - set this to match the `PLATFORM_NAME` you defined in the previous step.
+
+## Build Plugin
+
+TypeScript needs to be compiled into JavaScript before it can run. The following command will compile the contents of your [`src`](./src) directory and put the resulting code into the `dist` folder.
+
+```
+npm run build
+```
+
+## Link To Homebridge
+
+Run this command so your global install of Homebridge can discover the plugin in your development environment:
+
+```
+npm link
+```
+
+You can now start Homebridge, use the `-D` flag so you can see debug log messages in your plugin:
+
+```
+homebridge -D
+```
+
+## Watch For Changes and Build Automatically
+
+If you want to have your code compile automatically as you make changes, and restart Homebridge automatically between changes you can run:
+
+```
+npm run watch
+```
+
+This will launch an instance of Homebridge in debug mode which will restart every time you make a change to the source code. It will load the config stored in the default location under `~/.homebridge`. You may need to stop other running instances of Homebridge while using this command to prevent conflicts. You can adjust the Homebridge startup command in the [`nodemon.json`](./nodemon.json) file.
+
+## Customise Plugin
+
+You can now start customising the plugin template to suit your requirements.
+
+* [`src/platform.ts`](./src/platform.ts) - this is where your device setup and discovery should go.
+* [`src/platformAccessory.ts`](./src/platformAccessory.ts) - this is where your accessory control logic should go, you can rename or create multiple instances of this file for each accessory type you need to implement as part of your platform plugin. You can refer to the [developer documentation](https://developers.homebridge.io/) to see what characteristics you need to implement for each service type.
+* [`config.schema.json`](./config.schema.json) - update the config schema to match the config you expect from the user. See the [Plugin Config Schema Documentation](https://developers.homebridge.io/#/config-schema).
+
+## Versioning Your Plugin
+
+Given a version number `MAJOR`.`MINOR`.`PATCH`, such as `1.4.3`, increment the:
+
+1. **MAJOR** version when you make breaking changes to your plugin,
+2. **MINOR** version when you add functionality in a backwards compatible manner, and
+3. **PATCH** version when you make backwards compatible bug fixes.
+
+You can use the `npm version` command to help you with this:
+
+```bash
+# major update / breaking changes
+npm version major
+
+# minor update / new features
+npm version update
+
+# patch / bugfixes
+npm version patch
+```
+
+## Publish Package
+
+When you are ready to publish your plugin to [npm](https://www.npmjs.com/), make sure you have removed the `private` attribute from the [`package.json`](./package.json) file then run:
+
+```
+npm publish
+```
+
+If you are publishing a scoped plugin, i.e. `@username/homebridge-xxx` you will need to add `--access=public` to command the first time you publish.
+
+#### Publishing Beta Versions
+
+You can publish *beta* versions of your plugin for other users to test before you release it to everyone.
+
+```bash
+# create a new pre-release version (eg. 2.1.0-beta.1)
+npm version prepatch --preid beta
+
+# publsh to @beta
+npm publish --tag=beta
+```
+
+Users can then install the  *beta* version by appending `@beta` to the install command, for example:
+
+```
+sudo npm install -g homebridge-example-plugin@beta
+```
 
 
-### Notes
-Started from https://github.com/nfarina/homebridge-icontrol
-
-I helped to update the iControl accessory plugin above, then was inspired to fully support the platform by supporting all peripherals.

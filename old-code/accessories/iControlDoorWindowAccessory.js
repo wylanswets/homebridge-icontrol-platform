@@ -50,6 +50,8 @@ iControlDoorWindowAccessory.prototype.event = function(event) {
 
 iControlDoorWindowAccessory.prototype._getTamperStatus = function(callback) {
     var self = this;
+    callback(1, 1);
+    return;
     this.session._getCurrentStatus(function(data, error) {
         if(error === null) {
             for(var i in data.devices) {
@@ -63,15 +65,16 @@ iControlDoorWindowAccessory.prototype._getTamperStatus = function(callback) {
                           }
                       }
                   }
-      
-                  var tamperStatus = self._getHomeKitTamperStateFromTamperState(tampered);
-      
-                  callback(tamperStatus);
+                  console.log("*******");
+                  console.log(tampered);
+                  console.log(self._getHomeKitTamperStateFromTamperState(tampered));
+                  callback(self._getHomeKitTamperStateFromTamperState(tampered));
+                  
                 }
                 
               }
         } else {
-            callback(null);
+            callback(self._getHomeKitTamperStateFromTamperState(false));
         }
         
     });
@@ -113,8 +116,7 @@ iControlDoorWindowAccessory.prototype._getHomeKitTamperStateFromTamperState = fu
       case true: 
       case 'senTamp':
           return Characteristic.StatusTampered.TAMPERED;
-      case false: 
-      case 'senTampRes':
+      default:
           return Characteristic.StatusTampered.NOT_TAMPERED;
       
     }
